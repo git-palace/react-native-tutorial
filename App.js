@@ -1,51 +1,39 @@
 import React from 'react';
-import { FlatList, ActivityIndicator, Text, View  } from 'react-native';
+import {createStackNavigator, createAppContainer} from 'react-navigation';
+import { Button, View, Text } from 'react-native';
 
-export default class FetchExample extends React.Component {
-
-  constructor(props){
-    super(props);
-    this.state ={ isLoading: true}
-  }
-
-  componentDidMount(){
-    return fetch('https://facebook.github.io/react-native/movies.json')
-      .then((response) => response.json())
-      .then((responseJson) => {
-
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson.movies,
-        }, function(){
-
-        });
-
-      })
-      .catch((error) =>{
-        console.error(error);
-      });
-  }
-
-
-
-  render(){
-
-    if(this.state.isLoading){
-      return(
-        <View style={{flex: 1, padding: 20}}>
-          <ActivityIndicator/>
-        </View>
-      )
-    }
-
-    return(
-      <View style={{flex: 1, paddingTop:20}}>
-        <FlatList
-          data={this.state.dataSource}
-          renderItem={({item}) => <Text>{item.title}, {item.releaseYear}</Text>}
-          keyExtractor={({id}, index) => id}
-        />
-      </View>
+class HomeScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Welcome',
+  };
+  render() {
+    const {navigate} = this.props.navigation;
+    return (
+      <Button
+        title="Go to Jane's profile"
+        onPress={() => navigate('Profile', {name: 'Jane'})}
+      />
     );
   }
 }
+class ProfileScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Profile',
+  };
+  render() {
+    const { navigation } = this.props;
+    const name = navigation.getParam('name')
+    return (
+      <View><Text>Hello, {name}!</Text></View>
+    );
+  }
+}
+
+const MainNavigator = createStackNavigator({
+  Home: {screen: HomeScreen},
+  Profile: {screen: ProfileScreen},
+});
+
+const App = createAppContainer(MainNavigator);
+
+export default App;
