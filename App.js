@@ -1,39 +1,46 @@
 import React from 'react';
-import {createStackNavigator, createAppContainer} from 'react-navigation';
-import { Button, View, Text } from 'react-native';
+import { Animated, Text, View } from 'react-native';
 
-class HomeScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Welcome',
-  };
+class FadeInView extends React.Component {
+  state = {
+    fadeAnim: new Animated.Value(0),  // Initial value for opacity: 0
+  }
+
+  componentDidMount() {
+    Animated.timing(                  // Animate over time
+      this.state.fadeAnim,            // The animated value to drive
+      {
+        toValue: 1,                   // Animate to opacity: 1 (opaque)
+        duration: 10000,              // Make it take a while
+      }
+    ).start();                        // Starts the animation
+  }
+
   render() {
-    const {navigate} = this.props.navigation;
+    let { fadeAnim } = this.state;
+
     return (
-      <Button
-        title="Go to Jane's profile"
-        onPress={() => navigate('Profile', {name: 'Jane'})}
-      />
+      <Animated.View                 // Special animatable View
+        style={{
+          ...this.props.style,
+          opacity: fadeAnim,         // Bind opacity to animated value
+        }}
+      >
+        {this.props.children}
+      </Animated.View>
     );
   }
 }
-class ProfileScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Profile',
-  };
+
+// You can then use your `FadeInView` in place of a `View` in your components:
+export default class App extends React.Component {
   render() {
-    const { navigation } = this.props;
-    const name = navigation.getParam('name')
     return (
-      <View><Text>Hello, {name}!</Text></View>
-    );
+      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <FadeInView style={{width: 250, height: 50, backgroundColor: 'powderblue'}}>
+          <Text style={{fontSize: 28, textAlign: 'center', margin: 10}}>Fading in</Text>
+        </FadeInView>
+      </View>
+    )
   }
 }
-
-const MainNavigator = createStackNavigator({
-  Home: {screen: HomeScreen},
-  Profile: {screen: ProfileScreen},
-});
-
-const App = createAppContainer(MainNavigator);
-
-export default App;
